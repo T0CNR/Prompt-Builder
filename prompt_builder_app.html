@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prompt Builder</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; height: 100%; background: #000; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif; }
+    .container { max-width: 800px; margin: auto; padding: 1rem; display: flex; flex-direction: column; align-items: center; }
+    .card { background: #111; border-radius: 12px; padding: 2rem; width: 100%; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+    label { display: block; margin-top: 1rem; font-weight: bold; font-size: 0.95rem; }
+    select, textarea { width: 100%; margin-top: 0.5rem; padding: 0.6rem; background: #222; border: 1px solid #333; color: #fff; border-radius: 8px; font-size: 1rem; }
+    .preview { margin-top: 1.5rem; background: #111; border: 1px solid #333; padding: 1rem; border-radius: 8px; white-space: pre-wrap; font-family: monospace; min-height: 150px; }
+    button.copy { margin-top: 1rem; background: #007aff; color: #fff; padding: 0.75rem 1.5rem; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; }
+    @media (max-width: 600px) {
+      .container { padding: 0.5rem; }
+      .card { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1 style="text-align:center; font-size:1.8rem;">Prompt Builder</h1>
+      <label for="type">Project Type</label>
+      <select id="type">
+        <option value="Website">Website</option>
+        <option value="Game">Game</option>
+        <option value="App">App</option>
+        <option value="File">File</option>
+        <option value="Bot">Bot</option>
+        <option value="Essay">Essay</option>
+        <option value="Other">Other</option>
+      </select>
+      <label for="goal">Function or Goal of the Script</label>
+      <textarea id="goal" rows="2"></textarea>
+      <label for="rules">Rules, Logic or Constraints</label>
+      <textarea id="rules" rows="2"></textarea>
+      <label for="style">Styling Preferences</label>
+      <textarea id="style" rows="2"></textarea>
+      <label for="extra">Extra Features</label>
+      <textarea id="extra" rows="2"></textarea>
+      <div class="preview" id="preview"></div>
+      <button class="copy" id="copyBtn">Copy to Clipboard</button>
+    </div>
+  </div>
+  <script>
+    const typeEl = document.getElementById('type');
+    const goalEl = document.getElementById('goal');
+    const rulesEl = document.getElementById('rules');
+    const styleEl = document.getElementById('style');
+    const extraEl = document.getElementById('extra');
+    const previewEl = document.getElementById('preview');
+    const copyBtn = document.getElementById('copyBtn');
+
+    function getImpersonation(type) {
+      switch (type) {
+        case 'Website': return 'Act as a senior Web Developer with real-world project experience.';
+        case 'Game':    return 'Act as a professional Game Designer and Developer.';
+        case 'App':     return 'Act as a seasoned Software Engineer specializing in web apps.';
+        case 'File':    return 'Act as a Systems Architect experienced in file processing.';
+        case 'Bot':     return 'Act as an AI Chatbot Developer with conversational design expertise.';
+        case 'Essay':   return 'Act as a professional Writer and Editor with subject-matter expertise.';
+        default:        return 'Act as a specialist Consultant with relevant domain expertise.';
+      }
+    }
+
+    function getTypePreset(type) {
+      switch (type) {
+        case 'Essay':
+          return 'Ensure the essay meets Year 12 QCAA standards: demonstrate critical analysis, evaluation, and synthesis to achieve top ISMG grades.';
+        case 'Website':
+          return 'Include guidance on responsive design, performance optimization, accessibility, and SEO best practices.';
+        case 'Game':
+          return 'Cover core gameplay mechanics, level design principles, user experience flow, and performance considerations.';
+        case 'App':
+          return 'Detail the design and development of a web app: architecture patterns, user story mapping, API integration points, and testing strategies.';
+        case 'File':
+          return 'Specify file format handling, data validation rules, error handling, and performance requirements.';
+        case 'Bot':
+          return 'Define conversational flows, intent recognition logic, fallback strategies, and integration endpoints.';
+        default:
+          return 'Provide comprehensive details and edge-case handling relevant to the specified project type.';
+      }
+    }
+
+    function updatePrompt() {
+      const type = typeEl.value;
+      const realType = type === 'App' ? 'web app' : type.toLowerCase();
+      const goal = goalEl.value.trim();
+      const rules = rulesEl.value.trim();
+      const style = styleEl.value.trim();
+      const extra = extraEl.value.trim();
+      const impersonation = getImpersonation(type);
+      const preset = getTypePreset(type);
+
+      let prompt = `${impersonation}\nYou are to generate a ${realType} based on the following requirements:`;
+      if (goal) prompt += `\n• Function/Goal: ${goal}`;
+      if (rules) prompt += `\n• Rules/Constraints: ${rules}`;
+      if (style) prompt += `\n• Styling Preferences: ${style}`;
+      if (extra) prompt += `\n• Extra Features: ${extra}`;
+      prompt += `\n• Preset Guidance: ${preset}`;
+      prompt += `\nErrors are unacceptable; prioritize accuracy over speed.`;
+
+      previewEl.textContent = prompt;
+    }
+
+    [typeEl, goalEl, rulesEl, styleEl, extraEl].forEach(el => el.addEventListener('input', updatePrompt));
+    copyBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(previewEl.textContent);
+      copyBtn.textContent = 'Copied!';
+      setTimeout(() => { copyBtn.textContent = 'Copy to Clipboard'; }, 2000);
+    });
+
+    updatePrompt();
+  </script>
+</body>
+</html>
